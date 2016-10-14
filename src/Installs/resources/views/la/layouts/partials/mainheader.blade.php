@@ -7,7 +7,7 @@
 		<span class="logo-mini"><b>{{ LAConfigs::getByKey('sitename_short') }}</b></span>
 		<!-- logo for regular state and mobile devices -->
 		<span class="logo-lg"><b>{{ LAConfigs::getByKey('sitename_part1') }}</b>
-		 {{ LAConfigs::getByKey('sitename_part2') }}</span>
+		 {{ LAConfigs::getByKey('sitename_part2') . ' ' . LAConfigs::getByKey('site_version') }}</span>
 	</a>
 
 	<!-- Header Navbar -->
@@ -175,7 +175,7 @@
 				<!-- Control Sidebar Toggle Button -->
 				<li>
 					<a href="#" data-toggle="control-sidebar"><i class="fa fa-comments-o"></i> <span class="label label-warning">10</span></a>
-					
+
 				</li>
 				@endif
 			</ul>

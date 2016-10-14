@@ -28,12 +28,12 @@ class LAInstall extends Command
 	 * @var string
 	 */
 	protected $description = 'Install LaraAdmin Package. Generate whole structure for /admin.';
-	
+
 	protected $from;
 	protected $to;
 
 	var $modelsInstalled = ["User", "Role", "Permission", "Employee", "Department", "Upload", "Organization", "Backup"];
-	
+
 	/**
 	 * Generate Whole structure for /admin
 	 *
@@ -43,26 +43,43 @@ class LAInstall extends Command
 	{
 		try {
 			$this->info('LaraAdmin installation started...');
-			
+			//$this->info(getenv('CACHE_DRIVER'));
+			if (strtolower(getenv('CACHE_DRIVER')) !== 'array'){
+				if ($this->confirm("LaraAdmin requires an Array as CACHE_DRIVER, Do you wish to set your CACHE_DRIVER to ARRAY ?", true)) {
+					$envfile =  $this->openFile('.env');
+					$cachedriverline = $this->getLineWithString('.env','CACHE_DRIVER=');
+					$envfile = str_replace($cachedriverline, "CACHE_DRIVER=array\n",$envfile);
+					file_put_contents('.env', $envfile);
+					$this->Info('Cache driver has been setup accordingly please rerun this command again!');
+					return;
+				} else {
+					$this->error("Installation aborted. ARRAY cache driver is a prerequisite to run LaraAdmin. Thank you...");
+					return;
+				}
+			}
 			$from = base_path('vendor/dwij/laraadmin/src/Installs');
 			$to = base_path();
-			
 			$this->info('from: '.$from." to: ".$to);
-			
+
+			$config_data['sitename_part1'] = $this->ask("Please enter your sitename part 1: ", 'Lara');
+			$config_data['sitename_part2'] = $this->ask("Please enter your sitename part 2: ", 'Admin');
+			$config_data['sitename_short'] = $this->ask("Please enter your sitename short: ", 'LA');
+			$config_data['site_version'] = $this->ask("Please enter your site version: ", '1.0');
+
 			if ($this->confirm("Do you wish to set your DB config in the .env file ?", true)) {
 				$this->line("DB Assistant Initiated....");
-				
+
 				$db_data = array();
 				if(LAHelper::laravel_ver() == 5.3) {
-					$db_data['dbhost'] = $this->ask('Database Host');
-					$db_data['dbport'] = $this->ask('Database Port');
+					$db_data['dbhost'] = $this->ask('Database Host', 'localhost');
+					$db_data['dbport'] = $this->ask('Database Port', '3306');
 				}
 				$db_data['db'] = $this->ask('Database Name');
 				$db_data['dbuser'] = $this->ask('Database User');
 				$db_data['dbpass'] = $this->ask('Database Password', false);
-				
+
 				$envfile =  $this->openFile('.env');
-				
+
 				$dbline = $this->getLineWithString('.env', 'DB_DATABASE=');
 				$dbuserline = $this->getLineWithString('.env', 'DB_USERNAME=');
 				$dbpassline = $this->getLineWithString('.env', 'DB_PASSWORD=');
@@ -79,14 +96,8 @@ class LAInstall extends Command
 				$envfile = str_replace($dbpassline, "DB_PASSWORD=".$db_data['dbpass']."\n",$envfile);
 				file_put_contents('.env', $envfile);
 			}
-			
-			if ($this->confirm("LaraAdmin requires an Array as CACHE_DRIVER, Do you wish to set your CACHE_DRIVER to ARRAY ?", true)) {
-				$envfile =  $this->openFile('.env');
-				$cachedriverline = $this->getLineWithString('.env','CACHE_DRIVER=');
-				$envfile = str_replace($cachedriverline, "CACHE_DRIVER=array\n",$envfile);
-				file_put_contents('.env', $envfile);
-			}
-			
+
+
 			if ($this->confirm("This process may change/append to the following of your existing project files:"
 					."\n\n\t app/Http/routes.php"
 					."\n\t app/User.php"
@@ -103,13 +114,13 @@ class LAInstall extends Command
 					$this->copyFile($from."/app/Controllers/Controller.php", $to."/app/Http/Controllers/Controller.php");
 				}
 				$this->copyFile($from."/app/Controllers/HomeController.php", $to."/app/Http/Controllers/HomeController.php");
-				
+
 				// Models
 				$this->line('Generating Models...');
 				foreach ($this->modelsInstalled as $model) {
 					$this->copyFile($from."/app/Models/".$model.".php", $to."/app/".$model.".php");
 				}
-				
+
 				// Generate Uploads / Thumbnails folders in /storage
 				$this->line('Generating Uploads / Thumbnails folders...');
 				if(!file_exists($to."/storage/uploads")) {
@@ -120,37 +131,36 @@ class LAInstall extends Command
 					$this->info("mkdir: (".$to."/storage/thumbnails)");
 					mkdir($to."/storage/thumbnails");
 				}
-				
+
 				// Config
 				$this->line('Generating Config...');
 				$this->copyFile($from."/config/laraadmin.php", $to."/config/laraadmin.php");
-				
+
 				// la-assets
 				$this->line('Generating LaraAdmin Public Assets...');
 				$this->replaceFolder($from."/la-assets", $to."/public/la-assets");
 				// Use "git config core.fileMode false" for ignoring file permissions
 
-				// check CACHE_DRIVER to be array or else
-				// It is required for Zizaco/Entrust
-				// https://github.com/Zizaco/entrust/issues/468
-				$driver_type = env('CACHE_DRIVER');
-				if($driver_type != "array") {
-					throw new Exception("Please set Cache Driver to array in .env (Required for Zizaco\Entrust) and run la:install again:"
-							."\n\n\tCACHE_DRIVER=array\n\n", 1);
-				}
-				
+
+
 				// migrations
 				$this->line('Generating migrations...');
 				$this->copyFolder($from."/migrations", $to."/database/migrations");
-				
+
 				$this->line('Copying seeds...');
-				$this->copyFile($from."/seeds/DatabaseSeeder.php", $to."/database/seeds/DatabaseSeeder.php");
-				
+				$md = file_get_contents($from."/seeds/DatabaseSeeder.php");
+				$md = str_replace("__sitename_part1__", $config_data['sitename_part1'], $md);
+				$md = str_replace("__sitename_part2__", $config_data['sitename_part2'], $md);
+				$md = str_replace("__sitename_short__", $config_data['sitename_short'], $md);
+				$md = str_replace("__site_version__", $config_data['site_version'], $md);
+				file_put_contents($to."/database/seeds/DatabaseSeeder.php", $md);
+				//$this->copyFile($from."/seeds/DatabaseSeeder.php", $to."/database/seeds/DatabaseSeeder.php");
+
 				// resources
 				$this->line('Generating resources: assets + views...');
 				$this->copyFolder($from."/resources/assets", $to."/resources/assets");
 				$this->copyFolder($from."/resources/views", $to."/resources/views");
-				
+
 				// Checking database
 				$this->line('Checking database...');
 				DB::connection()->reconnect();
@@ -160,16 +170,16 @@ class LAInstall extends Command
 				$this->call('clear-compiled');
 				$this->call('cache:clear');
 				$this->info(exec('composer dump-autoload'));
-				
+
 				$this->call('migrate:refresh');
 				// $this->call('migrate:refresh', ['--seed']);
-				
+
 				// $this->call('db:seed', ['--class' => 'LaraAdminSeeder']);
 
 				// $this->line('Running seeds...');
 				// $this->info(exec('composer dump-autoload'));
 				$this->call('db:seed');
-				
+
 				// Install Spatie Backup
 				$this->call('vendor:publish', ['--provider' => 'Spatie\Backup\BackupServiceProvider']);
 
@@ -179,31 +189,31 @@ class LAInstall extends Command
 						."            'dump_command_path' => '/opt/lampp/bin', // only the path, so without 'mysqldump' or 'pg_dump'\n"
 						."            'dump_command_timeout' => 60 * 5, // 5 minute timeout\n"
 						."            'dump_using_single_transaction' => true, // perform dump using a single transaction\n";
-					
+
 					$envfile =  $this->openFile('config/database.php');
 					$mysqldriverline = $this->getLineWithString('config/database.php', "'driver' => 'mysql'");
 					$envfile = str_replace($mysqldriverline, $newDBConfig, $envfile);
 					file_put_contents('config/database.php', $envfile);
 				}
-				
+
 				// Routes
 				$this->line('Appending routes...');
 				//if(!$this->fileContains($to."/app/Http/routes.php", "laraadmin.adminRoute")) {
 				if(LAHelper::laravel_ver() == 5.3) {
-					$this->appendFile($from."/app/routes.php", $to."/routes/web.php");
+					$this->copyFile($from."/app/routes.php", $to."/routes/web.php");
 					$this->copyFile($from."/app/admin_routes.php", $to."/routes/admin_routes.php");
 				} else {
-					$this->appendFile($from."/app/routes.php", $to."/app/Http/routes.php");
+					$this->copyFile($from."/app/routes.php", $to."/app/Http/routes.php");
 					$this->copyFile($from."/app/admin_routes.php", $to."/app/Http/admin_routes.php");
 				}
-				// Utilities 
+				// Utilities
 				$this->line('Generating Utilities...');
 				// if(!$this->fileContains($to."/gulpfile.js", "admin-lte/AdminLTE.less")) {
 				$this->appendFile($from."/gulpfile.js", $to."/gulpfile.js");
-				
+
 				// Creating Super Admin User
 				$this->line('Creating Super Admin User...');
-				
+
 				$user = \App\User::where('context_id', "1")->first();
 				if(!isset($user['id'])) {
 					$data = array();
@@ -213,10 +223,10 @@ class LAInstall extends Command
 					$data['context_id']  = "1";
 					$data['type']  = "Employee";
 					$user = \App\User::create($data);
-					
+
 					// TODO: This is Not Standard. Need to find alternative
 					Eloquent::unguard();
-					
+
 					\App\Employee::create([
 						'name' => $data['name'],
 						'designation' => "Super Admin",
@@ -233,14 +243,14 @@ class LAInstall extends Command
 						'date_left' => date("Y-m-d"),
 						'salary_cur' => 0,
 					]);
-					
+
 					$this->info("Super Admin User '".$data['name']."' successfully created. ");
 				} else {
 					$this->info("Super Admin User '".$user['name']."' exists. ");
 				}
 				$role = \App\Role::whereName('SUPER_ADMIN')->first();
 				$user->attachRole($role);
-				
+
 				$this->info("\nLaraAdmin successfully installed. You can now login from yourdomain.com/admin !!!\n");
 			} else {
 				$this->error("Installation aborted. Please try again after backup. Thank you...");
@@ -255,17 +265,17 @@ class LAInstall extends Command
 			}
 		}
 	}
-	
+
 	private function openFile($from) {
 		$md = file_get_contents($from);
 		return $md;
 	}
-	
+
 	private function writeFile($from, $to) {
 		$md = file_get_contents($from);
 		file_put_contents($to, $md);
 	}
-	
+
 	private function getLineWithString($fileName, $str) {
 		$lines = file($fileName);
 		foreach ($lines as $lineNumber => $line) {
@@ -280,7 +290,7 @@ class LAInstall extends Command
 		// $this->info("copyFolder: ($from, $to)");
 		LAHelper::recurse_copy($from, $to);
 	}
-	
+
 	private function replaceFolder($from, $to) {
 		// $this->info("replaceFolder: ($from, $to)");
 		if(file_exists($to)) {
@@ -288,7 +298,7 @@ class LAInstall extends Command
 		}
 		LAHelper::recurse_copy($from, $to);
 	}
-	
+
 	private function copyFile($from, $to) {
 		// $this->info("copyFile: ($from, $to)");
 		if(!file_exists(dirname($to))) {
@@ -297,15 +307,15 @@ class LAInstall extends Command
 		}
 		copy($from, $to);
 	}
-	
+
 	private function appendFile($from, $to) {
 		// $this->info("appendFile: ($from, $to)");
-		
+
 		$md = file_get_contents($from);
-		
+
 		file_put_contents($to, $md, FILE_APPEND);
 	}
-	
+
 	// TODO:Method not working properly
 	private function fileContains($filePath, $text) {
 		$fileData = file_get_contents($filePath);

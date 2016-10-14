@@ -11,18 +11,18 @@ use DB;
 use Dwij\Laraadmin\Helpers\LAHelper;
 
 class LAConfigs extends Model
-{   
+{
 	protected $table = 'la_configs';
-	
+
 	protected $fillable = [
 		"key", "value"
 	];
-	
+
 	protected $hidden = [
-		
+
 	];
 	public static function getByKey($key){
 		return LAConfigs::where('key',$key)->first()->value;
 	}
-	
+
 }

@@ -10,8 +10,8 @@ use Dwij\Laraadmin\Helpers\LAHelper;
 class Menu extends Model
 {
     protected $table = 'la_menus';
-    
+
     protected $guarded = [
-        
+
     ];
 }
