@@ -80,6 +80,7 @@ class LAInstall extends Command
 
 				$envfile =  $this->openFile('.env');
 
+
 				$dbline = $this->getLineWithString('.env', 'DB_DATABASE=');
 				$dbuserline = $this->getLineWithString('.env', 'DB_USERNAME=');
 				$dbpassline = $this->getLineWithString('.env', 'DB_PASSWORD=');
