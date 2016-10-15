@@ -51,7 +51,7 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>Sitename Short (2/3 Characters)</label>
-									<input type="text" class="form-control" placeholder="LA" maxlength="2" name="sitename_short" value="{{LAConfigs::getByKey('sitename_short')}}">
+									<input type="text" class="form-control" placeholder="LA" maxlength="3" name="sitename_short" value="{{LAConfigs::getByKey('sitename_short')}}">
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -81,31 +81,31 @@
 								<div class="form-group">
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" name="sidebar_search" @if(LAConfigs::getByKey('sidebar_search') === 1) checked @endif>
+											<input type="checkbox" name="sidebar_search" @if(LAConfigs::getByKey('sidebar_search')) checked @endif>
 											Show Search Bar
 										</label>
 									</div>
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" name="show_messages" @if(LAConfigs::getByKey('show_messages') === 1) checked @endif>
+											<input type="checkbox" name="show_messages" @if(LAConfigs::getByKey('show_messages')) checked @endif>
 											Show Messages Icon
 										</label>
 									</div>
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" name="show_notifications" @if(LAConfigs::getByKey('show_notifications') === 1) checked @endif>
+											<input type="checkbox" name="show_notifications" @if(LAConfigs::getByKey('show_notifications')) checked @endif>
 											Show Notifications Icon
 										</label>
 									</div>
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" name="show_tasks" @if(LAConfigs::getByKey('show_tasks') === 1) checked @endif>
+											<input type="checkbox" name="show_tasks" @if(LAConfigs::getByKey('show_tasks')) checked @endif>
 											Show Tasks Icon
 										</label>
 									</div>
 									<div class="checkbox">
 										<label>
-											<input type="checkbox" name="show_rightsidebar" @if(LAConfigs::getByKey('show_rightsidebar') === 1) checked @endif>
+											<input type="checkbox" name="show_rightsidebar" @if(LAConfigs::getByKey('show_rightsidebar')) checked @endif>
 											Show Right SideBar Icon
 										</label>
 									</div>

@@ -48,22 +48,11 @@ class LAConfigController extends Controller
 	 */
 	public function store(Request $request) {
 		$all = $request->all();
-		if(!isset($all['sidebar_search'])) {
-			$all['sidebar_search'] = "0";
-		}
-		if(!isset($all['show_messages'])) {
-			$all['show_messages'] = "0";
-		}
-		if(!isset($all['show_notifications'])) {
-			$all['show_notifications'] = "0";
-		}
-		if(!isset($all['show_tasks'])) {
-			$all['show_tasks'] = "0";
-		}
-		if(!isset($all['show_rightsidebar'])) {
-			$all['show_rightsidebar'] = "0";
-		}
-
+		$all['sidebar_search'] = isset($all['sidebar_search']) ? 1 : 0;
+		$all['show_messages'] = isset($all['show_messages']) ? 1 : 0;
+		$all['show_notifications'] = isset($all['show_notifications']) ? 1 : 0;
+		$all['show_tasks'] = isset($all['show_tasks']) ? 1 : 0;
+		$all['show_rightsidebar'] = isset($all['show_rightsidebar']) ? 1 : 0;
 		foreach($all as $key => $value) {
 			LAConfigs::where('key',$key)->update(['value'=>$value]);
 		}

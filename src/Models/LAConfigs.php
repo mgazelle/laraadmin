@@ -22,7 +22,6 @@ class LAConfigs extends Model
 
 	];
 	public static function getByKey($key, $default = ''){
-		//dd(LAConfigs::where('key',$key)->first());
 		if (LAConfigs::where('key',$key)->count())
 			return LAConfigs::where('key',$key)->first()->value;
 		else
