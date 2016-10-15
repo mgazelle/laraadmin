@@ -8,7 +8,7 @@
         <span class="headerElems">
         @yield('headerElems')
         </span>
-    @else 
+    @else
         @hasSection('section')
         <ol class="breadcrumb">
             <li><a href="@yield('section_url')"><i class="fa fa-dashboard"></i> @yield('section')</a></li>

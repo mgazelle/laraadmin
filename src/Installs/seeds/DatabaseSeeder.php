@@ -91,6 +91,16 @@ class DatabaseSeeder extends Seeder
 		$laconfig->save();
 
 		$laconfig = new LAConfigs;
+		$laconfig->key = "default_email_address";
+		$laconfig->value = "__default_email_address__";
+		$laconfig->save();
+
+		$laconfig = new LAConfigs;
+		$laconfig->key = "default_email_name";
+		$laconfig->value = "__default_email_name__";
+		$laconfig->save();
+
+		$laconfig = new LAConfigs;
 		$laconfig->key = "sidebar_search";
 		$laconfig->value = "1";
 		$laconfig->save();

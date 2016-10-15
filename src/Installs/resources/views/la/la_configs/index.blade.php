@@ -63,6 +63,20 @@
 						</div>
 						<div class="row">
 							<div class="col-md-6">
+								<div class="form-group">
+									<label>Default Email Address</label>
+									<input type="text" class="form-control" placeholder="info@example.com" name="default_email_address" value="{{ LAConfigs::getByKey('default_email_address')}}">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Default Email Name</label>
+									<input type="text" class="form-control" placeholder="{{ LAConfigs::getByKey('sitename_part1') . ' ' . LAConfigs::getByKey('sitename_part2') }}" name="default_email_name" value="{{LAConfigs::getByKey('default_email_name')}}">
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
 								<!-- checkbox -->
 								<div class="form-group">
 									<div class="checkbox">

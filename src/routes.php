@@ -10,7 +10,7 @@ Route::group([
 	'as' => $as,
     'middleware' => ['web', 'auth', 'permission:ADMIN_PANEL', 'role:SUPER_ADMIN']
 ], function () {
-    
+
 	/* ================== Modules ================== */
 	Route::resource(config('laraadmin.adminRoute') . '/modules', 'ModuleController');
 	Route::resource(config('laraadmin.adminRoute') . '/module_fields', 'FieldController');
@@ -24,7 +24,7 @@ Route::group([
 	Route::post(config('laraadmin.adminRoute') . '/check_unique_val/{field_id}', 'FieldController@check_unique_val');
 	Route::get(config('laraadmin.adminRoute') . '/module_fields/{id}/delete', 'FieldController@destroy');
 	Route::get(config('laraadmin.adminRoute') . '/modules/{id}/delete', 'ModuleController@destroy');
-	
+
 	/* ================== Code Editor ================== */
 	Route::get(config('laraadmin.adminRoute') . '/laeditor', 'CodeEditorController@index');
 	Route::any(config('laraadmin.adminRoute') . '/laeditor_get_dir', 'CodeEditorController@get_dir');
@@ -34,10 +34,10 @@ Route::group([
 	/* ================== Menu Editor ================== */
 	Route::resource(config('laraadmin.adminRoute') . '/la_menus', 'MenuController');
 	Route::post(config('laraadmin.adminRoute') . '/la_menus/update_hierarchy', 'MenuController@update_hierarchy');
-	
+
 	/* ================== Configuration ================== */
 	Route::resource(config('laraadmin.adminRoute') . '/la_configs', 'LAConfigController');
-	
+
     Route::group([
         'middleware' => 'role'
     ], function () {

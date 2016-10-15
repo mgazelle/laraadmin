@@ -21,8 +21,12 @@ class LAConfigs extends Model
 	protected $hidden = [
 
 	];
-	public static function getByKey($key){
-		return LAConfigs::where('key',$key)->first()->value;
+	public static function getByKey($key, $default = ''){
+		//dd(LAConfigs::where('key',$key)->first());
+		if (LAConfigs::where('key',$key)->count())
+			return LAConfigs::where('key',$key)->first()->value;
+		else
+			return $default;
 	}
 
 }

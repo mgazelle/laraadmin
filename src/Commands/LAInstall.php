@@ -60,11 +60,11 @@ class LAInstall extends Command
 			$from = base_path('vendor/dwij/laraadmin/src/Installs');
 			$to = base_path();
 			$this->info('from: '.$from." to: ".$to);
-
-			$config_data['sitename_part1'] = $this->ask("Please enter your sitename part 1: ", 'Lara');
-			$config_data['sitename_part2'] = $this->ask("Please enter your sitename part 2: ", 'Admin');
-			$config_data['sitename_short'] = $this->ask("Please enter your sitename short: ", 'LA');
-			$config_data['site_version'] = $this->ask("Please enter your site version: ", '1.0');
+			$data = array();
+			$data['sitename_part1'] = $this->ask("Please enter your sitename part 1: ", 'Lara');
+			$data['sitename_part2'] = $this->ask("Please enter your sitename part 2: ", 'Admin');
+			$data['sitename_short'] = $this->ask("Please enter your sitename short: ", 'LA');
+			$data['site_version'] = $this->ask("Please enter your site version: ", '1.0');
 
 			if ($this->confirm("Do you wish to set your DB config in the .env file ?", true)) {
 				$this->line("DB Assistant Initiated....");
@@ -75,8 +75,8 @@ class LAInstall extends Command
 					$db_data['dbport'] = $this->ask('Database Port', '3306');
 				}
 				$db_data['db'] = $this->ask('Database Name');
-				$db_data['dbuser'] = $this->ask('Database User');
-				$db_data['dbpass'] = $this->ask('Database Password', false);
+				$db_data['dbuser'] = $this->ask('Database User', 'root');
+				$db_data['dbpass'] = $this->secret('Database Password', false);
 
 				$envfile =  $this->openFile('.env');
 
@@ -148,15 +148,6 @@ class LAInstall extends Command
 				$this->line('Generating migrations...');
 				$this->copyFolder($from."/migrations", $to."/database/migrations");
 
-				$this->line('Copying seeds...');
-				$md = file_get_contents($from."/seeds/DatabaseSeeder.php");
-				$md = str_replace("__sitename_part1__", $config_data['sitename_part1'], $md);
-				$md = str_replace("__sitename_part2__", $config_data['sitename_part2'], $md);
-				$md = str_replace("__sitename_short__", $config_data['sitename_short'], $md);
-				$md = str_replace("__site_version__", $config_data['site_version'], $md);
-				file_put_contents($to."/database/seeds/DatabaseSeeder.php", $md);
-				//$this->copyFile($from."/seeds/DatabaseSeeder.php", $to."/database/seeds/DatabaseSeeder.php");
-
 				// resources
 				$this->line('Generating resources: assets + views...');
 				$this->copyFolder($from."/resources/assets", $to."/resources/assets");
@@ -183,11 +174,11 @@ class LAInstall extends Command
 
 				// Install Spatie Backup
 				$this->call('vendor:publish', ['--provider' => 'Spatie\Backup\BackupServiceProvider']);
-
+				$mysql_bin_path = $this->ask('Please enter the Binaries Path to backup your Database: ', '/usr/bin');
 				// Edit config/database.php for Spatie Backup Configuration
 				if($this->getLineWithString('config/database.php', "dump_command_path") == -1) {
 					$newDBConfig = "            'driver' => 'mysql',\n"
-						."            'dump_command_path' => '/opt/lampp/bin', // only the path, so without 'mysqldump' or 'pg_dump'\n"
+						."            'dump_command_path' => $mysql_bin_path, // only the path, so without 'mysqldump' or 'pg_dump'\n"
 						."            'dump_command_timeout' => 60 * 5, // 5 minute timeout\n"
 						."            'dump_using_single_transaction' => true, // perform dump using a single transaction\n";
 
@@ -217,7 +208,6 @@ class LAInstall extends Command
 
 				$user = \App\User::where('context_id', "1")->first();
 				if(!isset($user['id'])) {
-					$data = array();
 					$data['name']     = $this->ask('Super Admin name');
 					$data['email']    = $this->ask('Super Admin email');
 					$data['password'] = bcrypt($this->secret('Super Admin password'));
@@ -251,6 +241,19 @@ class LAInstall extends Command
 				}
 				$role = \App\Role::whereName('SUPER_ADMIN')->first();
 				$user->attachRole($role);
+
+				// seeding the DB
+				$this->line('Copying seeds...');
+				$md = file_get_contents($from."/seeds/DatabaseSeeder.php");
+				$md = str_replace("__sitename_part1__", $data['sitename_part1'], $md);
+				$md = str_replace("__sitename_part2__", $data['sitename_part2'], $md);
+				$md = str_replace("__sitename_short__", $data['sitename_short'], $md);
+				$md = str_replace("__site_version__", $data['site_version'], $md);
+				$md = str_replace("__default_email_address__", $data['email'], $md);
+				$md = str_replace("__default_email_name__", $data['name'], $md);
+				file_put_contents($to."/database/seeds/DatabaseSeeder.php", $md);
+				//$this->copyFile($from."/seeds/DatabaseSeeder.php", $to."/database/seeds/DatabaseSeeder.php");
+
 
 				$this->info("\nLaraAdmin successfully installed. You can now login from yourdomain.com/admin !!!\n");
 			} else {
