@@ -33,68 +33,93 @@
 					<div class="box-body">
 						{{ csrf_field() }}
 						<!-- text input -->
-						<div class="form-group">
-							<label>Sitename First Word</label>
-							<input type="text" class="form-control" placeholder="Lara" name="sitename_part1" value="{{$configs[0]->value}}">
-						</div>
-						<div class="form-group">
-							<label>Sitename Second Word</label>
-							<input type="text" class="form-control" placeholder="Admin 1.0" name="sitename_part2" value="{{$configs[1]->value}}">
-						</div>
-						<div class="form-group">
-							<label>Sitename Short (2/3 Characters)</label>
-							<input type="text" class="form-control" placeholder="LA" maxlength="2" name="sitename_short" value="{{$configs[2]->value}}">
-						</div>
-						<!-- checkbox -->
-						<div class="form-group">
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" name="sidebar_search" @if($configs[3]->value=="on") checked @endif>
-									Show Search Bar
-								</label>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Sitename First Word</label>
+									<input type="text" class="form-control" placeholder="Lara" name="sitename_part1" value="{{ LAConfigs::getByKey('sitename_part1')}}">
+								</div>
 							</div>
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" name="show_messages" @if($configs[4]->value=="on") checked @endif>
-									Show Messages Icon
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" name="show_notifications" @if($configs[5]->value=="on") checked @endif>
-									Show Notifications Icon
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" name="show_tasks" @if($configs[6]->value=="on") checked @endif>
-									Show Tasks Icon
-								</label>
-							</div>
-							<div class="checkbox">
-								<label>
-									<input type="checkbox" name="show_rightsidebar" @if($configs[7]->value=="on") checked @endif>
-									Show Right SideBar Icon
-								</label>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Sitename Second Word</label>
+									<input type="text" class="form-control" placeholder="Admin 1.0" name="sitename_part2" value="{{LAConfigs::getByKey('sitename_part2')}}">
+								</div>
 							</div>
 						</div>
-						<!-- select -->
-						<div class="form-group">
-							<label>Skin Color</label>
-							<select class="form-control" name="skin">
-								@foreach($skins as $name=>$property)
-									<option value="{{ $property }}" @if($configs[8]->value == $property) selected @endif>{{ $name }}</option>
-								@endforeach
-							</select>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Sitename Short (2/3 Characters)</label>
+									<input type="text" class="form-control" placeholder="LA" maxlength="2" name="sitename_short" value="{{LAConfigs::getByKey('sitename_short')}}">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Site Version</label>
+									<input type="text" class="form-control" placeholder="1.0" maxlength="6" name="site_version" value="{{LAConfigs::getByKey('site_version')}}">
+								</div>
+							</div>
 						</div>
-						
-						<div class="form-group">
-							<label>Layout</label>
-							<select class="form-control" name="layout">
-								@foreach($layouts as $name=>$property)
-									<option value="{{ $property }}" @if($configs[9]->value == $property) selected @endif>{{ $name }}</option>
-								@endforeach
-							</select>
+						<div class="row">
+							<div class="col-md-6">
+								<!-- checkbox -->
+								<div class="form-group">
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" name="sidebar_search" @if(LAConfigs::getByKey('sidebar_search') === 1) checked @endif>
+											Show Search Bar
+										</label>
+									</div>
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" name="show_messages" @if(LAConfigs::getByKey('show_messages') === 1) checked @endif>
+											Show Messages Icon
+										</label>
+									</div>
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" name="show_notifications" @if(LAConfigs::getByKey('show_notifications') === 1) checked @endif>
+											Show Notifications Icon
+										</label>
+									</div>
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" name="show_tasks" @if(LAConfigs::getByKey('show_tasks') === 1) checked @endif>
+											Show Tasks Icon
+										</label>
+									</div>
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" name="show_rightsidebar" @if(LAConfigs::getByKey('show_rightsidebar') === 1) checked @endif>
+											Show Right SideBar Icon
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<!-- select -->
+								<div class="form-group">
+									<label>Skin Color</label>
+									<select class="form-control" name="skin">
+										@foreach($skins as $name=>$property)
+											<option value="{{ $property }}" @if(LAConfigs::getByKey('skin') === $property) selected @endif>{{ $name }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Layout</label>
+									<select class="form-control" name="layout">
+										@foreach($layouts as $name=>$property)
+											<option value="{{ $property }}" @if(LAConfigs::getByKey('layout') === $property) selected @endif>{{ $name }}</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
 						</div>
 					</div><!-- /.box-body -->
 					<div class="box-footer">

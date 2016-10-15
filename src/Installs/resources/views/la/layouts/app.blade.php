@@ -32,29 +32,29 @@ desired effect
 
 <body class="{{ LAConfigs::getByKey('skin') }} {{ LAConfigs::getByKey('layout') }} {{ $sidebar_mini or '' }}" bsurl="{{ url('') }}" adminRoute="{{ config('laraadmin.adminRoute') }}">
 <div class="wrapper">
+	<div class="container">
+		@include('la.layouts.partials.mainheader')
 
-	@include('la.layouts.partials.mainheader')
+		@include('la.layouts.partials.sidebar')
 
-	@include('la.layouts.partials.sidebar')
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
 
-	<!-- Content Wrapper. Contains page content -->
-	<div class="content-wrapper">
-		
-		@if(!isset($no_header))
-			@include('la.layouts.partials.contentheader')
-		@endif
-		
-		<!-- Main content -->
-		<section class="content {{ $no_padding or '' }}">
-			<!-- Your Page Content Here -->
-			@yield('main-content')
-		</section><!-- /.content -->
-	</div><!-- /.content-wrapper -->
+			@if(!isset($no_header))
+				@include('la.layouts.partials.contentheader')
+			@endif
 
-	@include('la.layouts.partials.controlsidebar')
+			<!-- Main content -->
+			<section class="content {{ $no_padding or '' }}">
+				<!-- Your Page Content Here -->
+				@yield('main-content')
+			</section><!-- /.content -->
+		</div><!-- /.content-wrapper -->
 
-	@include('la.layouts.partials.footer')
+		@include('la.layouts.partials.controlsidebar')
 
+		@include('la.layouts.partials.footer')
+	</div><!-- ./container -->
 </div><!-- ./wrapper -->
 
 @include('la.layouts.partials.file_manager')
